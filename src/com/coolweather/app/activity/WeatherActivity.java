@@ -1,12 +1,14 @@
 package com.coolweather.app.activity;
 
 import android.app.Activity;
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.text.TextUtils;
 import android.view.View;
 import android.view.Window;
+import android.widget.Button;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
@@ -25,6 +27,9 @@ public class WeatherActivity extends Activity {
 	private TextView temp2Text;//用于显示气温2
 	private TextView currentDateText;//用于显示当前日期
 	
+	private Button switchCity;//切换城市按钮
+	private Button refreshWeather;//更新天气按钮
+	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
@@ -38,6 +43,35 @@ public class WeatherActivity extends Activity {
 		temp1Text = (TextView) findViewById(R.id.temp1);
 		temp2Text = (TextView) findViewById(R.id.temp2);
 		currentDateText = (TextView) findViewById(R.id.current_date);
+		
+		//按钮
+		switchCity = (Button) findViewById(R.id.switch_city);
+		switchCity.setOnClickListener(new View.OnClickListener() {
+			
+			@Override
+			public void onClick(View v) {
+				// TODO Auto-generated method stub
+				Intent intent = new Intent(WeatherActivity.this, ChooseAreaActivity.class);
+				intent.putExtra("from_weather_activity", true);
+				startActivity(intent);
+				finish();
+			}
+		});
+		
+		refreshWeather = (Button) findViewById(R.id.refresh_weather);
+		refreshWeather.setOnClickListener(new View.OnClickListener() {
+			
+			@Override
+			public void onClick(View v) {
+				// TODO Auto-generated method stub
+				publishText.setText("同步中...");
+				SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(WeatherActivity.this);
+				String weatherCode = prefs.getString("weather_code", "");
+				if (!TextUtils.isEmpty(weatherCode)) {
+					queryWeatherInfo(weatherCode);
+				}
+			}
+		});
 
 		String countyCode = getIntent().getStringExtra("county_code");
 		if (!TextUtils.isEmpty(countyCode)) {
